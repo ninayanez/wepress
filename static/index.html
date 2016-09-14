@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel='stylesheet' href='css/fonts.css'>
+    <link rel='stylesheet' href='css/font-awesome.min.css'>
+    <link rel='stylesheet' href='css/s.css'>
+  </head>
+  <body>
+    <ul class='menu'>
+      <li id='open'><b>&#xf1c5;</b><p><i>O</i>pen...</p></li>
+      <!-- <li><b>&#38;#xf0c7;</b><p><i>S</i>ave...</p></li> -->
+      <li id='edit'><b>&#xf040;</b><p><i>E</i>dit</p>
+        <ul class='editMenu'>
+          <li id='crop'><b>&#xf125;</b><p><i>C</i>rop</p></li>
+          <li id='scale'><b>&#xf065;</b><p><i>S</i>cale</p></li>
+          <li id='rotateRight'><b>&#xf01e;</b><p><i>R</i>ight</p></li>
+          <li id='rotateLeft'><b>&#xf0e2;</b><p><i>L</i>eft</p></li>
+        </ul>
+      </li>
+      <!-- <li></li> -->
+      <!-- <li>&#38;#xf065;</li> -->
+      <!-- <li>&#xf0e2;</li> -->
+      <!-- <li>&#xf01e;</li> -->
+      <li id='make'><b>&#xf0e7;</b><p><i>M</i>ake</p>
+        <ul class='makeMenu'>
+          <li id='mono'><b>&#xf186;</b><p><i>M</i>ono</p></li>
+          <li id='rgb'><b>&#xf185;</b><p><i>C</i>olor</p></li>
+        </ul>
+      </li>
+      <li id='settings'><b>&#xf013;</b><p><i>S</i>ettings</p>
+        <ul class='settingsMenu'>
+        <li id='pixelSize'><p><i>P</i>ixel size</p></li>
+          <li id='bedWidth'><p><i>B</i>ed width</p></li>
+          <li id='bedHeight'><p><i>B</i>ed Height</p></li>
+        </ul>
+      </li>
+    </ul>
+    <canvas id='cvs'></canvas>
+  </body>
+  <script>window.onload = function (e) {require('../dist/app.js')}</script>
+</html>
