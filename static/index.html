@@ -9,7 +9,7 @@
     <ul class='menu'>
       <li id='open'><b>&#xf1c5;</b><p><i>O</i>pen...</p></li>
       <!-- <li><b>&#38;#xf0c7;</b><p><i>S</i>ave...</p></li> -->
-      <li id='edit'><b>&#xf040;</b><p><i>E</i>dit</p>
+      <li id='edit'><h2>edit</h2>
         <ul class='editMenu'>
           <li id='crop'><b>&#xf125;</b><p><i>C</i>rop</p></li>
           <li id='scale'><b>&#xf065;</b><p><i>S</i>cale</p></li>
@@ -21,17 +21,23 @@
       <!-- <li>&#38;#xf065;</li> -->
       <!-- <li>&#xf0e2;</li> -->
       <!-- <li>&#xf01e;</li> -->
-      <li id='make'><b>&#xf0e7;</b><p><i>M</i>ake</p>
+      <li id='make'><h2>make</h2>
         <ul class='makeMenu'>
           <li id='mono'><b>&#xf186;</b><p><i>M</i>ono</p></li>
           <li id='rgb'><b>&#xf185;</b><p><i>C</i>olor</p></li>
         </ul>
       </li>
-      <li id='settings'><b>&#xf013;</b><p><i>S</i>ettings</p>
+      <li id='settings'><h2>settings</h2>
         <ul class='settingsMenu'>
-        <li id='pixelSize'><p><i>P</i>ixel size</p></li>
-          <li id='bedWidth'><p><i>B</i>ed width</p></li>
-          <li id='bedHeight'><p><i>B</i>ed Height</p></li>
+          <li id='lineWidth'><p><i>L</i>ine width</p>
+            <input type='number' class='lineWidth'><span>mm.</span>
+          </li>
+          <li id='bedWidth'><p><i>B</i>ed width</p>
+          <input class='bedWidth' type='number'><span>mm.</span>
+          </li>
+          <li id='bedHeight'><p><i>B</i>ed Height</p>
+            <input class='bedHeight' type='number'><span>mm.</span>
+          </li>
         </ul>
       </li>
     </ul>

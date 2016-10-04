@@ -1,0 +1,33 @@
+{
+  "name": "WePress",
+  "version": "1.0.0",
+  "description": "Gui for converting images to 3d printable letterpess plates",
+  "main": "dist/main.js",
+  "author": "nina yañez",
+  "license": "BSD",
+  "keywords": [
+    "letterpress",
+    "3d print",
+    "stl"
+  ],
+  "dependencies": {
+    "babel": "5.8.29",
+    "floyd-steinberg": "^1.0.4",
+    "get-pixels": "^3.3.0",
+    "imageToStl": "^1.0.1",
+    "jimp": "^0.2.24",
+    "jpeg-js": "^0.2.0",
+    "ndarray": "^1.0.18",
+    "node-dithering": "0.0.1",
+    "pngjs-nozlib": "^1.0.0",
+    "save-pixels": "^2.3.3",
+    "single-line-log": "^1.1.1",
+    "three": "^0.77.1",
+    "through2": "^2.0.1",
+    "underscore": "^1.8.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "make"
+  }
+}

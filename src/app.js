@@ -4,117 +4,49 @@ import getPix from 'get-pixels'
 import jimp from 'jimp'
 import floyd from 'floyd-steinberg'
 import stl from './index.js'
+import menu from './menu.js'
 import p from '../node_modules/paper/dist/paper-core.js'
 import fs from 'fs'
 import _ from 'underscore'
 const PNG = require('pngjs-nozlib').PNG
 const ipc = require('electron').ipcRenderer
 
-ipc.on('data', (event, arg) => {
-  console.log(event,arg)
-})
-
-ipc.send('data','vorple')
-
-
 // contain components in a single hash
 // menu items disabled/enabled toggle
 // handle menu items (use text to make api calls)
 // how to do sub-menus?
 
-let mask = false
-let raster = false
-let group = false
-let bg = false
-let image = false
-let printBed = false
+menu.on('data', (d) => { // call api
+  const action = d.toString()
+  console.log(action)
+})
+
+let mask,
+    raster,
+    group, 
+    bg,
+    image,
+    printBed = false
 
 const fileDir = fs.realpathSync(__dirname).replace('/dist','/files/')
-const cvs = document.getElementById('cvs')
-
-cvs.width = window.innerWidth
-cvs.height = window.innerHeight
-
-const ctx = cvs.getContext('2d')
 
 const tinkerine = {
-  pixel: 0.65,
+  lineWidth: 0.65,
   width: 215,
   height: 160
 }
 
-p.setup(cvs)
+const cvs = document.getElementById('cvs')
+cvs.width = window.innerWidth
+cvs.height = window.innerHeight
 
-function drawPrintBed (dim) {
-  const gutter = 30 // in mm
-  const w = parseInt((dim.width-gutter)/dim.pixel)
-  const h = parseInt((dim.height-gutter)/dim.pixel)
+const lineWidth = document.querySelector('.lineWidth')
+const bedWidth = document.querySelector('.bedWidth')
+const bedHeight = document.querySelector('.bedHeight')
 
-  const bed = new p.Shape.Rectangle({
-    fillColor: 'rgba(255,255,255,0.2)',
-    strokeColor: 'black',
-    strokeWidth: 0.75,
-    point: [200,40],
-    size: [w,h]
-  })
-
-  const wLabel = new p.PointText({
-    content: w,
-    fontFamily: 'apercu',
-    fillColor:'black',
-    fontSize: '12px',
-    point: [0,0]
-  })
-  wLabel.position.x = bed.bounds.center.x 
-  wLabel.position.y = 
-    bed.bounds.center.y + (bed.bounds.height*0.5) + 8
-
-  const wLeft = new p.Path.Line(
-    [bed.bounds.center.x - (bed.bounds.width/2), wLabel.bounds.center.y
-    ],[
-     bed.bounds.center.x - (wLabel.bounds.width/2) - 4, wLabel.bounds.center.y
-  ])
-  wLeft.strokeColor = 'black'
-  wLeft.strokeWidth = 0.75
-
-  const wRight = wLeft.clone()
-  wRight.position.x+=((wLabel.bounds.width)+8+(wLeft.bounds.width))
-
-  console.log(wRight.segments)
-
-  const hLabel = wLabel.clone()
-  hLabel.content= h
-  hLabel.position.x = wRight.segments[1].point.x+(hLabel.bounds.width/2)+4
-  hLabel.position.y = bed.bounds.center.y
-
-  const hTop = new p.Path.Line({
-    from: [hLabel.position.x - (hLabel.bounds.width/2)+4,40],
-    to: [hLabel.position.x-(hLabel.bounds.width/2)+4,hLabel.position.y-8],
-    strokeColor: 'black',
-    strokeWidth: 0.75
-  })
-  const hBot = hTop.clone()
-  hBot.position.y += hBot.bounds.height + hLabel.bounds.height + 2
-
-  p.view.draw()
-
-  console.log(wRight)
-
-  // const wDim = new p.Group({
-
-  // })
-  
-  // const hDim = new p.Group({
-
-  // })
-}
-
-drawPrintBed(tinkerine)
-
-p.view.draw()
-
-// color seperation!!!
-// make a button toolbar
+lineWidth.value = tinkerine.lineWidth
+bedWidth.value = tinkerine.width
+bedHeight.value = tinkerine.height
 
 const events = {
   crop : (e) => {
@@ -144,47 +76,24 @@ const events = {
   }
 }
 
+p.setup(cvs)
+
+ipc.on('data', (event, arg) => {
+  console.log(event,arg)
+})
+
+ipc.send('data','vorple')
+
+drawPrintBed(tinkerine)
+
+p.view.draw()
+
 window.addEventListener('keydown', (e) => {
   if (e.keyCode===13) events.crop(e)
   if (e.keyCode===27) events.esc(e)
   if (e.keyCode===32) events.dither(e)
   if (e.keyCode===13&&e.ctrlKey) events.convert(e)
 }, false)
-
-function canvasMouseDown (e) { // draw crop window
-  if (!raster) return 
-
-   mask = new p.Path.Rectangle({
-    name : 'selection',
-    fillColor : 'black',
-    strokeColor : 'black',
-    point : [100, 100],
-    size : [1, 1],
-    visible : false
-  })
-
-  bg = raster.clone()
-  bg.opacity = 0.3
-
-  mask.fillColor = 'black'
-  mask.visible = true
-  mask.opacity = 1
-  mask.strokeColor = 'rgba(0,0,0,0)'
-  mask.bringToFront()
-  group = new p.Group(mask,raster)
-  group.children[0].clipMask = true
-
-  const c0 = [e.clientX, e.clientY] 
-  window.onmousemove = (ev) => {
-    const c3 = [ev.clientX, ev.clientY]
-    const c1 = [(c3[0] - c0[0]) + c0[0], c0[1]]
-    const c2 = [c0[0], (c3[1] - c0[1]) + c0[1]]
-    mask.segments = [c0, c2, c3, c1]
-    p.view.draw()
-  }
-}
-
-function canvasMouseUp (e) { p.view.draw() }
 
 // draw printer bed in window
 window.onmouseup = (e) => { window.onmousemove = null }
@@ -250,4 +159,130 @@ function convert (filepath, cb) {
   toStl.on('close', () => {
     console.log('converted')
   })
+}
+
+function drawPrintBed (dim) {
+  const gutter = 30 // in mm
+  const w = parseInt((dim.width-gutter)/dim.lineWidth)
+  const h = parseInt((dim.height-gutter)/dim.lineWidth)
+
+  const matte = new p.Path.Rectangle({
+    opacity: 0.65,
+    fillColor: '#f1f1f1',
+    from: [0,0],
+    to: [window.innerWidth,window.innerHeight]
+  })
+
+  const bed = new p.Shape.Rectangle({
+    fillColor: 'rgba(255,255,255,0.2)',
+    strokeColor: 'black',
+    strokeWidth: 0.75,
+    point: [(p.view.center.x + 160)-(w/2),240],
+    size: [w,h]
+  })
+
+  const viewPort = bed.clone()
+
+  const onion = new p.Group([matte,viewPort])
+  viewPort.clipMask = true
+
+  const handle = new p.Shape.Circle({
+    center: [bed.bounds.x,bed.bounds.y],
+    radius: 10,
+    fillColor: 'pink'
+  })
+
+  handle.onMouseEnter = (e) => {
+    handle.style.fillColor = 'black'  
+  }
+
+  handle.onMouseLeave = (e) => {
+    handle.style.fillColor = 'pink'
+  }
+
+  bed.bringToFront()
+
+  console.log(bed.bounds)
+
+  const wLabel = new p.PointText({
+    content: w,
+    fontFamily: 'apercu',
+    fillColor:'black',
+    fontSize: '12px',
+    point: [0,0]
+  })
+  wLabel.position.x = bed.bounds.center.x 
+  wLabel.position.y = 
+    bed.bounds.center.y + (bed.bounds.height*0.5) + 8
+
+  const wLeft = new p.Path.Line(
+    [bed.bounds.center.x - (bed.bounds.width/2), wLabel.bounds.center.y
+    ],[
+     bed.bounds.center.x - (wLabel.bounds.width/2) - 4, wLabel.bounds.center.y
+  ])
+  wLeft.strokeColor = 'black'
+  wLeft.strokeWidth = 0.75
+
+  const wRight = wLeft.clone()
+
+  wRight.position.x+=((wLabel.bounds.width)+8+(wLeft.bounds.width))
+
+  const hLabel = wLabel.clone()
+  hLabel.content= h
+  hLabel.position.x = wRight.segments[1].point.x+(hLabel.bounds.width/2)+4
+  hLabel.position.y = bed.bounds.center.y
+
+  const hTop = new p.Path.Line({
+    from: [hLabel.position.x - (hLabel.bounds.width/2)+4,240],
+    to: [hLabel.position.x-(hLabel.bounds.width/2)+4,hLabel.position.y-8],
+    strokeColor: 'black',
+    strokeWidth: 0.75
+  })
+
+  const hBot = hTop.clone()
+
+  hBot.position.y += hBot.bounds.height + hLabel.bounds.height + 2
+
+  const viewBox = new p.Group([
+    handle,wLabel,wLeft,wRight,hLabel,hTop,hBot,bed
+  ])
+
+  console.log(viewBox.bounds)
+
+  p.view.draw()
+}
+
+function canvasMouseUp (e) { p.view.draw() }
+
+function canvasMouseDown (e) { // draw crop window
+  if (!raster) return 
+
+   mask = new p.Path.Rectangle({
+    name : 'selection',
+    fillColor : 'black',
+    strokeColor : 'black',
+    point : [100, 100],
+    size : [1, 1],
+    visible : false
+  })
+
+  bg = raster.clone()
+  bg.opacity = 0.3
+
+  mask.fillColor = 'black'
+  mask.visible = true
+  mask.opacity = 1
+  mask.strokeColor = 'rgba(0,0,0,0)'
+  mask.bringToFront()
+  group = new p.Group(mask,raster)
+  group.children[0].clipMask = true
+
+  const c0 = [e.clientX, e.clientY] 
+  window.onmousemove = (ev) => {
+    const c3 = [ev.clientX, ev.clientY]
+    const c1 = [(c3[0] - c0[0]) + c0[0], c0[1]]
+    const c2 = [c0[0], (c3[1] - c0[1]) + c0[1]]
+    mask.segments = [c0, c2, c3, c1]
+    p.view.draw()
+  }
 }
