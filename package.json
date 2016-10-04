@@ -14,7 +14,6 @@
     "babel": "5.8.29",
     "floyd-steinberg": "^1.0.4",
     "get-pixels": "^3.3.0",
-    "imageToStl": "^1.0.1",
     "jimp": "^0.2.24",
     "jpeg-js": "^0.2.0",
     "ndarray": "^1.0.18",
