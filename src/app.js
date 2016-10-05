@@ -8,7 +8,6 @@ import menu from './menu.js'
 import p from '../node_modules/paper/dist/paper-core.js'
 import fs from 'fs'
 import _ from 'underscore'
-const PNG = require('pngjs-nozlib').PNG
 const ipc = require('electron').ipcRenderer
 
 // contain components in a single hash
@@ -17,8 +16,11 @@ const ipc = require('electron').ipcRenderer
 // how to do sub-menus?
 
 menu.on('data', (d) => { // call api
-  const action = d.toString()
-  console.log(action)
+  const str = d.toString()
+  const cmd = str.split(':')[0]
+  const arg = str.split(':')[1]
+  if (!uiEvents[cmd]) return
+  uiEvents[cmd](arg)
 })
 
 let mask,
@@ -48,7 +50,10 @@ lineWidth.value = tinkerine.lineWidth
 bedWidth.value = tinkerine.width
 bedHeight.value = tinkerine.height
 
-const events = {
+const uiEvents = {
+  open : (e) => {
+
+  },
   crop : (e) => {
     e.preventDefault()
     if (!group) return
@@ -61,22 +66,33 @@ const events = {
     bg.remove()
     p.view.draw()
   },
-  esc : (e) => {
-    if (mask.visible) mask.visible = false
-    p.view.draw()
+  rotateLeft : (e) => {
+
   },
-  dither : (e) => {
+  rotateRight : (e) => {
+
+  },
+  scale : (e) => {
+
+  },
+  lineWidth : (e) => {
+
+  },
+  bedHeight : (e) => {
+
+  },
+  bedWidth : (e) => {
+
+  }
+  mono : (e) => {
     const dith = floyd(raster.getImageData(),raster.width,raster.height)
     raster.setImageData(dith,new p.Point(0,0))
     p.view.draw()
-  },
-  convert : (e) => {
-    // write image file!
-    // write using jimp and spawn convert
+  }, 
+  rgb : (e) => {
+
   }
 }
-
-p.setup(cvs)
 
 ipc.on('data', (event, arg) => {
   console.log(event,arg)
